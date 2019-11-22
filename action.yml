@@ -1,0 +1,10 @@
+# action.yml
+name: 'Angular Github Actions'
+description: 'Angular cli and EndToEnd Test environment '
+author: 'Mayur Rawte' 
+branding:
+  icon: 'layers'
+  color: 'red'
+runs:
+  using: 'node12'
+  main: 'action.js'
