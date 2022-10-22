@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Mayur Rawte <rawte.mayur@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.2.6",

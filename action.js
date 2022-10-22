@@ -8,4 +8,5 @@ function execute(command) {
    })
  }
  execute("npm install -g @angular/cli")
- execute("npm install -g protractor")
+ execute("npm install -g nx")
+ execute("npm install -g cypess")
