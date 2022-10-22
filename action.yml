@@ -1,10 +1,10 @@
 # action.yml
 name: 'Angular Github Actions'
-description: 'Angular cli and EndToEnd Test environment '
+description: 'Get Latest Angular Cli'
 author: 'Mayur Rawte' 
 branding:
   icon: 'layers'
   color: 'red'
 runs:
   using: 'node16'
-  main: 'action.js'
+  main: 'dist/action.js'
