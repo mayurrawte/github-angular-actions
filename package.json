@@ -2,14 +2,16 @@
   "name": "angular-github-actions",
   "version": "1.0.1",
   "description": "Action to provide node and angular environment .",
-  "main": "action.js",
+  "main": "dist/action.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mayur Rawte <rawte.mayur@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.2.6",
-    "@actions/github": "^1.1.0"
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@types/node": "^18.11.3"
   }
 }
