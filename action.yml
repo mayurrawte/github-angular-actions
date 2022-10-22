@@ -7,4 +7,5 @@ branding:
   color: 'red'
 runs:
   using: 'node16'
-  main: 'action.js'
+  main: 'dist/action.js'
+  post: 'dist/cache-save.js'
