@@ -1,10 +1,21 @@
 # action.yml
 name: 'Angular Github Actions'
-description: 'Get Latest Angular Cli'
-author: 'Mayur Rawte' 
+description: 'Install Angular CLI and cache npm dependencies'
+author: 'Mayur Rawte'
 branding:
   icon: 'layers'
   color: 'red'
+inputs:
+  version:
+    description: 'Angular CLI version to install'
+    required: false
+    default: 'latest'
+outputs:
+  cli-version:
+    description: 'Installed Angular CLI version'
+  installation-output:
+    description: 'Output from npm install'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/action.js'
+
