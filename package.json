@@ -1,6 +1,6 @@
 {
   "name": "angular-github-actions",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Action to provide node and angular environment .",
   "main": "dist/action.js",
   "scripts": {
@@ -12,6 +12,7 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
+    "@actions/cache": "^3.2.0",
     "@types/node": "^18.11.3"
   }
 }
