@@ -22,6 +22,10 @@ inputs:
     description: 'Path to the lock file for caching (e.g. packages/app/package-lock.json). Defaults to repo root.'
     required: false
     default: ''
+  cache:
+    description: 'Enable package manager caching. Set to false to disable (e.g. if no lock file exists).'
+    required: false
+    default: 'true'
 
 outputs:
   cli-version:
@@ -41,7 +45,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
-        cache: ${{ inputs.package-manager }}
+        cache: ${{ inputs.cache == 'true' && inputs.package-manager || '' }}
         cache-dependency-path: ${{ inputs.cache-dependency-path }}
 
     - name: Install Angular CLI (npm)

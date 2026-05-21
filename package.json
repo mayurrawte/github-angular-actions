@@ -1,0 +1,8 @@
+{
+  "name": "angular-setup",
+  "version": "2.0.0",
+  "description": "GitHub Action: setup Node.js, cache npm/yarn/pnpm, and install Angular CLI",
+  "private": true,
+  "author": "Mayur Rawte <rawte.mayur@gmail.com>",
+  "license": "MIT"
+}
