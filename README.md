@@ -28,6 +28,7 @@ Installs the latest Angular CLI on Node 22 with npm caching. Zero config.
 | `node-version` | `22` | Node.js version — e.g. `22`, `20`, `18` |
 | `package-manager` | `npm` | `npm`, `yarn`, or `pnpm` |
 | `cache-dependency-path` | _(repo root)_ | Lock file path for monorepos |
+| `cache` | `true` | Set to `false` to disable package manager caching |
 
 ## Outputs
 
