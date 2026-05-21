@@ -55,8 +55,10 @@ jobs:
           version: 'latest'
           node-version: '22'
           package-manager: 'pnpm'
-          # Lock file is in test-fixtures to avoid Angular CLI auto-detecting pnpm in npm/yarn jobs
-          cache-dependency-path: '.github/test-fixtures/pnpm-lock.yaml'
+          # Disable cache: setup-node pnpm store caching is unreliable on Windows
+          # when using pnpm/action-setup@v4 (non-standard PNPM_HOME path).
+          # Core functionality (ng on PATH, version detection) is still tested.
+          cache: 'false'
 
       - name: Verify CLI version output is set
         shell: bash

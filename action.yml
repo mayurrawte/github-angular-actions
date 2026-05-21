@@ -76,16 +76,20 @@ runs:
       env:
         INPUT_PM: ${{ inputs.package-manager }}
       run: |
-        # Read version directly from the installed package.json — no PATH dependency
         if [ "$INPUT_PM" = "pnpm" ]; then
-          CLI_ROOT=$(pnpm root -g 2>/dev/null || echo "")
+          # pnpm list -g --json is reliable regardless of store location
+          CLI_VERSION=$(pnpm list -g @angular/cli --json 2>/dev/null | node -e \
+            "let b='';process.stdin.on('data',c=>b+=c);process.stdin.on('end',()=>{try{const a=JSON.parse(b);const i=Array.isArray(a)?a[0]:a;process.stdout.write(i?.dependencies?.['@angular/cli']?.version||'unknown')}catch(e){process.stdout.write('unknown')}})" \
+            2>/dev/null || echo "unknown")
         elif [ "$INPUT_PM" = "yarn" ]; then
-          CLI_ROOT="$(yarn global dir 2>/dev/null)/node_modules"
+          export CLI_ROOT="$(yarn global dir 2>/dev/null)/node_modules"
+          CLI_VERSION=$(node -e \
+            "try{process.stdout.write(require(process.env.CLI_ROOT+'/@angular/cli/package.json').version)}catch(e){process.stdout.write('unknown')}" \
+            2>/dev/null || echo "unknown")
         else
-          CLI_ROOT=$(npm root -g 2>/dev/null || echo "")
+          export CLI_ROOT=$(npm root -g 2>/dev/null || echo "")
+          CLI_VERSION=$(node -e \
+            "try{process.stdout.write(require(process.env.CLI_ROOT+'/@angular/cli/package.json').version)}catch(e){process.stdout.write('unknown')}" \
+            2>/dev/null || echo "unknown")
         fi
-        export CLI_ROOT
-        CLI_VERSION=$(node -e \
-          "try{process.stdout.write(require(process.env.CLI_ROOT+'/@angular/cli/package.json').version)}catch(e){process.stdout.write('unknown')}" \
-          2>/dev/null || echo "unknown")
         echo "cli-version=${CLI_VERSION:-unknown}" >> "$GITHUB_OUTPUT"
