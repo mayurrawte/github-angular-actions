@@ -56,7 +56,9 @@ runs:
     - name: Install Angular CLI (pnpm)
       if: ${{ inputs.package-manager == 'pnpm' }}
       shell: bash
-      run: pnpm add -g @angular/cli@${{ inputs.version }}
+      run: |
+        pnpm add -g @angular/cli@${{ inputs.version }}
+        echo "$(pnpm bin -g)" >> "$GITHUB_PATH"
 
     - name: Install Angular CLI (yarn)
       if: ${{ inputs.package-manager == 'yarn' }}
@@ -69,5 +71,5 @@ runs:
       id: get-version
       shell: bash
       run: |
-        CLI_VERSION=$(ng version 2>/dev/null | grep -i 'Angular CLI:' | awk '{print $NF}')
+        CLI_VERSION=$(ng version 2>/dev/null | grep -i 'Angular CLI:' | awk '{print $NF}' || true)
         echo "cli-version=${CLI_VERSION:-unknown}" >> "$GITHUB_OUTPUT"
