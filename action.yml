@@ -69,5 +69,5 @@ runs:
       id: get-version
       shell: bash
       run: |
-        CLI_VERSION=$(ng version 2>/dev/null | grep -i 'Angular CLI:' | awk '{print $NF}' || echo "unknown")
-        echo "cli-version=$CLI_VERSION" >> "$GITHUB_OUTPUT"
+        CLI_VERSION=$(ng version 2>/dev/null | grep -i 'Angular CLI:' | awk '{print $NF}')
+        echo "cli-version=${CLI_VERSION:-unknown}" >> "$GITHUB_OUTPUT"
