@@ -51,14 +51,17 @@ runs:
     - name: Install Angular CLI (npm)
       if: ${{ inputs.package-manager == 'npm' || inputs.package-manager == '' }}
       shell: bash
-      run: npm install -g @angular/cli@${{ inputs.version }}
+      run: |
+        npm install -g @angular/cli@${{ inputs.version }}
+        echo "$(npm prefix -g)/bin" >> "$GITHUB_PATH"
 
     - name: Install Angular CLI (pnpm)
       if: ${{ inputs.package-manager == 'pnpm' }}
       shell: bash
       run: |
+        # Put global bins in PNPM_HOME (already on PATH from pnpm/action-setup)
+        pnpm config set global-bin-dir "$PNPM_HOME"
         pnpm add -g @angular/cli@${{ inputs.version }}
-        echo "$(pnpm bin -g)" >> "$GITHUB_PATH"
 
     - name: Install Angular CLI (yarn)
       if: ${{ inputs.package-manager == 'yarn' }}
@@ -70,6 +73,19 @@ runs:
     - name: Get Angular CLI version
       id: get-version
       shell: bash
+      env:
+        INPUT_PM: ${{ inputs.package-manager }}
       run: |
-        CLI_VERSION=$(ng version 2>/dev/null | grep -i 'Angular CLI:' | awk '{print $NF}' || true)
+        # Read version directly from the installed package.json — no PATH dependency
+        if [ "$INPUT_PM" = "pnpm" ]; then
+          CLI_ROOT=$(pnpm root -g 2>/dev/null || echo "")
+        elif [ "$INPUT_PM" = "yarn" ]; then
+          CLI_ROOT="$(yarn global dir 2>/dev/null)/node_modules"
+        else
+          CLI_ROOT=$(npm root -g 2>/dev/null || echo "")
+        fi
+        export CLI_ROOT
+        CLI_VERSION=$(node -e \
+          "try{process.stdout.write(require(process.env.CLI_ROOT+'/@angular/cli/package.json').version)}catch(e){process.stdout.write('unknown')}" \
+          2>/dev/null || echo "unknown")
         echo "cli-version=${CLI_VERSION:-unknown}" >> "$GITHUB_OUTPUT"

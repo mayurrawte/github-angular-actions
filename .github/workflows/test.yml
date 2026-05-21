@@ -2,7 +2,7 @@ name: Test Action
 
 on:
   push:
-    branches: [master, main, 'feat/**']
+    branches: [master, main, 'feat/**', 'fix/**']
   pull_request:
     branches: [master, main]
 
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run action with npm (default)
+      - name: Run action with npm
         id: setup
         uses: ./
         with:
@@ -55,6 +55,8 @@ jobs:
           version: 'latest'
           node-version: '22'
           package-manager: 'pnpm'
+          # Lock file is in test-fixtures to avoid Angular CLI auto-detecting pnpm in npm/yarn jobs
+          cache-dependency-path: '.github/test-fixtures/pnpm-lock.yaml'
 
       - name: Verify CLI version output is set
         shell: bash
@@ -86,6 +88,7 @@ jobs:
           version: 'latest'
           node-version: '22'
           package-manager: 'yarn'
+          cache-dependency-path: '.github/test-fixtures/yarn.lock'
 
       - name: Verify CLI version output is set
         shell: bash
@@ -135,7 +138,7 @@ jobs:
       matrix:
         include:
           - node: '18'
-            cli-version: '17.3.8'  # last CLI version supporting Node 18
+            cli-version: '17.3.8'
           - node: '20'
             cli-version: 'latest'
           - node: '22'
