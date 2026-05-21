@@ -1,0 +1,158 @@
+name: Test Action
+
+on:
+  push:
+    branches: [master, main, 'feat/**']
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  # ── npm ──────────────────────────────────────────────────────────────────
+  test-npm:
+    name: Test — npm (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run action with npm (default)
+        id: setup
+        uses: ./
+        with:
+          version: 'latest'
+          node-version: '22'
+          package-manager: 'npm'
+
+      - name: Verify CLI version output is set
+        shell: bash
+        run: |
+          echo "CLI version: ${{ steps.setup.outputs.cli-version }}"
+          if [ "${{ steps.setup.outputs.cli-version }}" = "unknown" ]; then
+            echo "ERROR: cli-version output was 'unknown'"
+            exit 1
+          fi
+
+      - name: Verify ng is on PATH
+        shell: bash
+        run: ng version
+
+  # ── pnpm ─────────────────────────────────────────────────────────────────
+  test-pnpm:
+    name: Test — pnpm (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run action with pnpm
+        id: setup
+        uses: ./
+        with:
+          version: 'latest'
+          node-version: '22'
+          package-manager: 'pnpm'
+
+      - name: Verify CLI version output is set
+        shell: bash
+        run: |
+          echo "CLI version: ${{ steps.setup.outputs.cli-version }}"
+          if [ "${{ steps.setup.outputs.cli-version }}" = "unknown" ]; then
+            echo "ERROR: cli-version output was 'unknown'"
+            exit 1
+          fi
+
+      - name: Verify ng is on PATH
+        shell: bash
+        run: ng version
+
+  # ── yarn ─────────────────────────────────────────────────────────────────
+  test-yarn:
+    name: Test — yarn (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run action with yarn
+        id: setup
+        uses: ./
+        with:
+          version: 'latest'
+          node-version: '22'
+          package-manager: 'yarn'
+
+      - name: Verify CLI version output is set
+        shell: bash
+        run: |
+          echo "CLI version: ${{ steps.setup.outputs.cli-version }}"
+          if [ "${{ steps.setup.outputs.cli-version }}" = "unknown" ]; then
+            echo "ERROR: cli-version output was 'unknown'"
+            exit 1
+          fi
+
+      - name: Verify ng is on PATH
+        shell: bash
+        run: ng version
+
+  # ── pinned version ────────────────────────────────────────────────────────
+  test-pinned-version:
+    name: Test — pinned Angular CLI version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run action with pinned Angular CLI version
+        id: setup
+        uses: ./
+        with:
+          version: '17.3.8'
+          node-version: '20'
+          package-manager: 'npm'
+
+      - name: Verify the correct version was installed
+        shell: bash
+        run: |
+          INSTALLED="${{ steps.setup.outputs.cli-version }}"
+          echo "Installed: $INSTALLED"
+          if [ "$INSTALLED" != "17.3.8" ]; then
+            echo "ERROR: expected 17.3.8, got $INSTALLED"
+            exit 1
+          fi
+
+  # ── Node version matrix ───────────────────────────────────────────────────
+  test-node-versions:
+    name: Test — Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run action with Node ${{ matrix.node }}
+        id: setup
+        uses: ./
+        with:
+          version: 'latest'
+          node-version: ${{ matrix.node }}
+          package-manager: 'npm'
+
+      - name: Verify node version
+        shell: bash
+        run: |
+          NODE_VER=$(node --version)
+          echo "Node version: $NODE_VER"
+          if [[ "$NODE_VER" != v${{ matrix.node }}* ]]; then
+            echo "ERROR: expected Node ${{ matrix.node }}, got $NODE_VER"
+            exit 1
+          fi
+
+      - name: Verify ng is on PATH
+        shell: bash
+        run: ng version
