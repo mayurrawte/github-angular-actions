@@ -1,21 +1,69 @@
-# action.yml
 name: 'Angular Github Actions'
-description: 'Install Angular CLI and cache npm dependencies'
+description: 'Setup Node.js, package manager caching, and Angular CLI — npm, yarn, and pnpm supported'
 author: 'Mayur Rawte'
 branding:
   icon: 'layers'
   color: 'red'
+
 inputs:
   version:
-    description: 'Angular CLI version to install'
+    description: 'Angular CLI version to install (e.g. 17.3.8, 18.0.0, or latest)'
     required: false
     default: 'latest'
+  node-version:
+    description: 'Node.js version to use (e.g. 22, 20, 18)'
+    required: false
+    default: '22'
+  package-manager:
+    description: 'Package manager to cache and use for the global CLI install: npm, yarn, or pnpm'
+    required: false
+    default: 'npm'
+  cache-dependency-path:
+    description: 'Path to the lock file for caching (e.g. packages/app/package-lock.json). Defaults to repo root.'
+    required: false
+    default: ''
+
 outputs:
   cli-version:
-    description: 'Installed Angular CLI version'
-  installation-output:
-    description: 'Output from npm install'
-runs:
-  using: 'node20'
-  main: 'dist/action.js'
+    description: 'The installed Angular CLI version string (e.g. 17.3.8)'
+    value: ${{ steps.get-version.outputs.cli-version }}
 
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      if: ${{ inputs.package-manager == 'pnpm' }}
+      uses: pnpm/action-setup@v4
+      with:
+        version: latest
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: ${{ inputs.package-manager }}
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+
+    - name: Install Angular CLI (npm)
+      if: ${{ inputs.package-manager == 'npm' || inputs.package-manager == '' }}
+      shell: bash
+      run: npm install -g @angular/cli@${{ inputs.version }}
+
+    - name: Install Angular CLI (pnpm)
+      if: ${{ inputs.package-manager == 'pnpm' }}
+      shell: bash
+      run: pnpm add -g @angular/cli@${{ inputs.version }}
+
+    - name: Install Angular CLI (yarn)
+      if: ${{ inputs.package-manager == 'yarn' }}
+      shell: bash
+      run: |
+        yarn global add @angular/cli@${{ inputs.version }}
+        echo "$(yarn global bin)" >> "$GITHUB_PATH"
+
+    - name: Get Angular CLI version
+      id: get-version
+      shell: bash
+      run: |
+        CLI_VERSION=$(ng version 2>/dev/null | grep -i 'Angular CLI:' | awk '{print $NF}' || echo "unknown")
+        echo "cli-version=$CLI_VERSION" >> "$GITHUB_OUTPUT"
