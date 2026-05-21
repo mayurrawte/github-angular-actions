@@ -1,8 +1,8 @@
-name: 'Angular Github Actions'
-description: 'Setup Node.js, package manager caching, and Angular CLI — npm, yarn, and pnpm supported'
+name: 'Angular Setup'
+description: 'One-step Angular CI setup: installs Angular CLI, configures Node.js, and caches npm, yarn, or pnpm.'
 author: 'Mayur Rawte'
 branding:
-  icon: 'layers'
+  icon: 'zap'
   color: 'red'
 
 inputs:

@@ -1,10 +1,12 @@
-# Angular Github Actions
+# Angular Setup — GitHub Action
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 ![Test Action](https://github.com/mayurrawte/github-angular-actions/actions/workflows/test.yml/badge.svg)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Angular%20Setup-blue?logo=github)](https://github.com/marketplace/actions/angular-github-actions)
+![Platforms](https://img.shields.io/badge/runs%20on-ubuntu%20%7C%20windows%20%7C%20macos-lightgrey)
 
-> GitHub Action to set up Node.js, cache your package manager, and install Angular CLI — all in one step.
-> Supports **npm**, **yarn**, and **pnpm**.
+> **One step.** Set up Node.js, cache your package manager, and install Angular CLI.
+> Works with **npm**, **yarn**, and **pnpm** — no boilerplate required.
 
 ---
 
@@ -14,30 +16,30 @@
 - uses: mayurrawte/github-angular-actions@v2
 ```
 
-That's it. Installs the latest Angular CLI with Node 22 and npm caching enabled by default.
+Installs the latest Angular CLI on Node 22 with npm caching. Zero config.
 
 ---
 
 ## Inputs
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `version` | No | `latest` | Angular CLI version to install (e.g. `17.3.8`, `18.0.0`, `latest`) |
-| `node-version` | No | `22` | Node.js version (e.g. `22`, `20`, `18`) |
-| `package-manager` | No | `npm` | Package manager: `npm`, `yarn`, or `pnpm` |
-| `cache-dependency-path` | No | _(repo root)_ | Path to lock file for caching (useful for monorepos) |
+| Input | Default | Description |
+|-------|---------|-------------|
+| `version` | `latest` | Angular CLI version — e.g. `17.3.8`, `18.0.0`, or `latest` |
+| `node-version` | `22` | Node.js version — e.g. `22`, `20`, `18` |
+| `package-manager` | `npm` | `npm`, `yarn`, or `pnpm` |
+| `cache-dependency-path` | _(repo root)_ | Lock file path for monorepos |
 
 ## Outputs
 
 | Output | Description |
 |--------|-------------|
-| `cli-version` | The installed Angular CLI version string (e.g. `17.3.8`) |
+| `cli-version` | Installed Angular CLI version, e.g. `17.3.8` |
 
 ---
 
 ## Examples
 
-### Minimal — latest everything
+### Default — latest Angular, Node 22, npm
 
 ```yml
 steps:
@@ -60,7 +62,22 @@ steps:
   - run: npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
-### Use pnpm
+### Angular 16+ with Jest
+
+Angular 16 and above supports Jest as the test runner. No extra setup needed — just run your test command after the action:
+
+```yml
+steps:
+  - uses: actions/checkout@v4
+  - uses: mayurrawte/github-angular-actions@v2
+    with:
+      version: 'latest'
+      node-version: '22'
+  - run: npm ci
+  - run: npm test  # runs Jest if configured via ng generate jest
+```
+
+### pnpm
 
 ```yml
 steps:
@@ -73,7 +90,7 @@ steps:
   - run: pnpm build
 ```
 
-### Use yarn
+### yarn
 
 ```yml
 steps:
@@ -98,28 +115,33 @@ steps:
   - run: npm ci --workspace=packages/app
 ```
 
-### Capture the installed CLI version
+### Use the `cli-version` output downstream
 
 ```yml
 steps:
   - uses: actions/checkout@v4
   - uses: mayurrawte/github-angular-actions@v2
     id: ng-setup
-    with:
-      version: 'latest'
-  - run: echo "Installed Angular CLI ${{ steps.ng-setup.outputs.cli-version }}"
+  - run: echo "Running on Angular CLI ${{ steps.ng-setup.outputs.cli-version }}"
 ```
 
 ---
 
-## When to use this vs `actions/setup-node`
+## Why this action?
 
-Use this action when you want a **globally installed Angular CLI** at a specific version — common in:
-- Legacy projects that run `ng` directly in CI scripts
-- Shared runner environments where multiple Angular projects need the same CLI
-- Environments where `@angular/cli` is not a devDependency
+| Feature | This action | `actions/setup-node` only |
+|---------|:-----------:|:-------------------------:|
+| Installs Angular CLI globally | ✅ | ❌ |
+| Specific CLI version | ✅ | ❌ |
+| Node.js version selection | ✅ | ✅ |
+| npm caching | ✅ | ✅ |
+| **pnpm caching** | ✅ | ✅ (manual config) |
+| **yarn caching** | ✅ | ✅ (manual config) |
+| Monorepo lock file path | ✅ | ✅ (manual config) |
+| Exposes `cli-version` output | ✅ | ❌ |
+| Zero config | ✅ | ❌ (need extra step) |
 
-If `@angular/cli` is already in your `package.json` devDependencies (most modern projects), `actions/setup-node@v4` with `cache: npm` is sufficient — you don't need this action.
+Use this action when `@angular/cli` is **not** in your `devDependencies` — common in legacy projects, shared runner setups, or anywhere you run `ng` directly in CI scripts.
 
 ---
 
